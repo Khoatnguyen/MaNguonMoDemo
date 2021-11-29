@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DemoMVC.Models;
-
+using DemoMVC.Data;
 namespace DemoMVC.Controllers
 {
     public class MoviesController : Controller
@@ -19,9 +19,17 @@ namespace DemoMVC.Controllers
         }
 
         // GET: Movies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Movie.ToListAsync());
+            var movieslist = from m in _context.Movie
+                 select m;
+
+         if (!String.IsNullOrEmpty(searchString))
+            {
+                movieslist = movieslist.Where(m => m.Title.Contains(searchString));
+            }
+
+            return View(await movieslist.ToListAsync());
         }
 
         // GET: Movies/Details/5
